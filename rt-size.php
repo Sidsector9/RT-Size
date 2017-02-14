@@ -13,23 +13,38 @@ Text Domain: rtsize
 
 class RT_Size {
 	public function __construct() {
-		add_action( 'admin_init', function() {
-			add_settings_section( 'rt-size-section', 'RT Size', function() {
-				echo '<p>Add a custom size for image uploads</p>';
-			}, 'media' );
+		add_action( 'admin_init', array( $this, 'rt_size_setup' ) );
+	}
 
-			add_settings_field( 'rt-size-field', 'Custom dimension', function() {
-				?>
-				<label for="rt-size-field">Width</label>
-				<input type="number" name="rt-size-field[]" class="small-text" value="<?php echo esc_html( get_option( 'rt-size-field' )[0] ) ?>">
+	public function rt_size_setup() {
+		add_settings_section( 'rt-size-section', 'RT Size', array( $this, 'rt_settings_section_callback' ), 'media' );
+		add_settings_field( 'rt-size-field', 'Custom dimension', array( $this, 'rt_settings_field_callback' ), 'media', 'rt-size-section', array( 'label_for' => 'rt-size-field' ) );
+		register_setting( 'media', 'rt-size-field' );
+		add_filter( 'image_size_names_choose', array( $this, 'rt_size_in_admin' ) );
+	}
 
-				<label for="rt-size-field">Height</label>
-				<input type="number" name="rt-size-field[]" class="small-text" value="<?php echo esc_html( get_option( 'rt-size-field' )[1] ) ?>">
-				<?php
-			}, 'media', 'rt-size-section', array( 'label_for' => 'rt-size-field' ) );
+	public function rt_settings_section_callback() {
+		echo '<p>Add a custom size for image uploads lols</p>';
+	}
 
-			register_setting( 'media', 'rt-size-field' );
-		});
+	public function rt_settings_field_callback() {
+		?>
+		<label for="rt-size-field">Width</label>
+		<input 
+			type="number" 
+			name="rt-size-field[]" 
+			class="small-text" 
+			value="<?php echo esc_html( get_option( 'rt-size-field' )[0] ) ?>"
+		>
+
+		<label for="rt-size-field">Height</label>
+		<input 
+			type="number" 
+			name="rt-size-field[]" 
+			class="small-text" 
+			value="<?php echo esc_html( get_option( 'rt-size-field' )[1] ) ?>"
+		>
+		<?php
 	}
 
 	public function rt_add_image_size() {
@@ -39,6 +54,12 @@ class RT_Size {
 				add_image_size( 'rt-image-size', $dimensions[0], $dimensions[1], false );
 			}
 		}
+	}
+
+	public function rt_size_in_admin( $sizes ) {
+	    return array_merge( $sizes, array(
+	        'rt-image-size' => __( 'RT size' ),
+	    ) );
 	}
 }
 
