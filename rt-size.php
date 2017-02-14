@@ -44,14 +44,14 @@ if ( ! class_exists( 'RT_Size' ) ) {
 			add_settings_section( 'rt-size-section', 'RT Size', array( $this, 'rt_settings_section_callback' ), 'media' );
 			add_settings_field( 'rt-size-field', 'Custom dimension', array( $this, 'rt_settings_field_callback' ), 'media', 'rt-size-section', array( 'label_for' => 'rt-size-field' ) );
 			register_setting( 'media', 'rt-size-field' );
-			add_filter( 'image_size_names_choose', array( $this, 'rt_size_in_admin' ) );
+			add_filter( 'image_size_names_choose', array( $this, 'rt_size_in_media_popup' ) );
 		}
 
 		/**
 		 * A function to display short description.
 		 */
 		public function rt_settings_section_callback() {
-			echo '<p>Add a custom size for image uploads lols</p>';
+			printf( '<p>%s</p>', esc_html__( 'Add a custom size for image uploads', 'rtsize' ) );
 		}
 
 		/**
@@ -59,21 +59,24 @@ if ( ! class_exists( 'RT_Size' ) ) {
 		 * take Width and Height parameneters.
 		 */
 		public function rt_settings_field_callback() {
+			$dimensions = get_option( 'rt-size-field' );
+			$width = ! empty( $dimensions[0] ) ? $dimensions[0] : null;
+			$height = ! empty( $dimensions[1] ) ? $dimensions[1] : null;
 			?>
-			<label for="rt-size-field">Width</label>
+			<label for="rt-size-field"><?php echo esc_html__( 'Width', 'rtsize' ) ?></label>
 			<input 
 				type="number" 
 				name="rt-size-field[]" 
 				class="small-text" 
-				value="<?php echo esc_html( get_option( 'rt-size-field' )[0] ) ?>"
+				value="<?php if ( ! is_null( $width ) ) { echo esc_attr( $width ); } ?>"
 			>
 
-			<label for="rt-size-field">Height</label>
+			<label for="rt-size-field"><?php echo esc_html__( 'Height', 'rtsize' ) ?></label>
 			<input 
 				type="number" 
 				name="rt-size-field[]" 
 				class="small-text" 
-				value="<?php echo esc_html( get_option( 'rt-size-field' )[1] ) ?>"
+				value="<?php if ( ! is_null( $height ) ) { echo esc_attr( $height ); } ?>"
 			>
 			<?php
 		}
@@ -81,6 +84,8 @@ if ( ! class_exists( 'RT_Size' ) ) {
 		/**
 		 * Registers a new image size based on the input values
 		 * set by the user.
+		 *
+		 * @since v1.0
 		 */
 		public function rt_add_image_size() {
 			if ( function_exists( 'add_image_size' ) ) {
@@ -97,8 +102,10 @@ if ( ! class_exists( 'RT_Size' ) ) {
 		 *
 		 * @param Array $sizes holds all the different
 		 * image sizes.
+		 *
+		 * @since v1.0
 		 */
-		public function rt_size_in_admin( $sizes ) {
+		public function rt_size_in_media_popup( $sizes ) {
 		    return array_merge( $sizes, array(
 		        'rt-image-size' => __( 'RT size' ),
 		    ) );
@@ -107,6 +114,7 @@ if ( ! class_exists( 'RT_Size' ) ) {
 }
 
 if ( class_exists( 'RT_Size' ) ) {
-	$p = new RT_Size();
-	$p->rt_add_image_size();
+	global $rt_size;
+	$rt_size = new RT_Size();
+	$rt_size->rt_add_image_size();
 }
