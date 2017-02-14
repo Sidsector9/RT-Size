@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: RT Size
- * Plugin URI:  https://github.com/Sidsector9/euclid-mam/tree/euclid-mam-v2
+ * Plugin URI:  https://github.com/Sidsector9/RT-Size/blob/non-anonymous/rt-size.php
  * Description: A simple plugin to add a custom image size
  * Version:     1.0
  * Author:      Siddharth Thevaril
